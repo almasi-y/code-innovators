@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useTimer } from "react-timer-hook";
 
-// Festival date: September 27, 2026 at 08:00 EAT (UTC+3)
-const FESTIVAL_DATE = new Date("2026-09-27T08:00:00+03:00");
+// Festival date: September 27, 2026 at 08:00 EAT (UTC+3) = 05:00 UTC
+// Using Date.UTC to avoid iOS Safari rejecting the +03:00 offset in ISO strings
+const FESTIVAL_DATE = new Date(Date.UTC(2026, 8, 27, 5, 0, 0));
 
 interface TimeUnitProps {
   value: number;
@@ -14,10 +15,10 @@ interface TimeUnitProps {
 function TimeUnit({ value, label }: TimeUnitProps) {
   const display = String(value).padStart(2, "0");
   return (
-    <div className="flex flex-col items-center gap-2 sm:gap-3">
+    <div className="flex flex-col items-center gap-1.5 sm:gap-3">
       {/* Digit card */}
       <div
-        className="relative flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden"
+        className="relative flex items-center justify-center w-16 h-16 xs:w-20 xs:h-20 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-xl sm:rounded-2xl overflow-hidden"
         style={{
           background:
             "linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
@@ -40,13 +41,13 @@ function TimeUnit({ value, label }: TimeUnitProps) {
           style={{ background: "rgba(0,0,0,0.4)" }}
         />
         <span
-          className="relative z-10 font-mono font-bold text-4xl sm:text-5xl md:text-6xl tracking-tighter text-white"
+          className="relative z-10 font-mono font-bold text-2xl xs:text-3xl sm:text-5xl md:text-6xl tracking-tighter text-white"
         >
           {display}
         </span>
       </div>
       {/* Label */}
-      <span className="text-xs sm:text-sm uppercase tracking-widest text-white/50 font-medium">
+      <span className="text-[10px] xs:text-xs sm:text-sm uppercase tracking-widest text-white/50 font-medium">
         {label}
       </span>
     </div>
@@ -55,7 +56,7 @@ function TimeUnit({ value, label }: TimeUnitProps) {
 
 function Separator() {
   return (
-    <div className="flex flex-col items-center gap-4 pb-8 sm:pb-10 md:pb-12 self-center">
+    <div className="hidden sm:flex flex-col items-center gap-4 pb-8 sm:pb-10 md:pb-12 self-center">
       <div
         className="w-1.5 h-1.5 rounded-full"
         style={{ background: "var(--color-accent)", opacity: 0.6 }}
@@ -118,7 +119,7 @@ export default function FestivalCountdown() {
 
         {/* Digit row – only rendered client-side to avoid hydration mismatch */}
         {mounted && !hasExpired && (
-          <div className="flex items-center justify-center gap-3 sm:gap-4 md:gap-6">
+          <div className="flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
             <TimeUnit value={days} label="Days" />
             <Separator />
             <TimeUnit value={hours} label="Hours" />
@@ -129,8 +130,8 @@ export default function FestivalCountdown() {
           </div>
         )}
         {!mounted && (
-          <div className="flex items-center justify-center gap-3 sm:gap-4 md:gap-6">
-            {["Days", "Hours", "Minutes", "Seconds"].map((label, i) => (
+          <div className="flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
+            {["Days", "Hours", "Minutes", "Seconds"].map((label) => (
               <TimeUnit key={label} value={0} label={label} />
             ))}
           </div>
