@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Navbar from '@/app/components/sections/Navbar'
 import Footer from '@/app/components/sections/Footer'
+import { submitRegistration } from '@/app/actions/submitRegistration'
 
 const teamOptions = ['1 – 2 teams', '3 – 5 teams', '5 – 10 teams']
 
@@ -27,14 +28,12 @@ export default function RegisterPage() {
         e.preventDefault()
         setLoading(true)
         setError(null)
-        // TODO: replace with your server action
-        try {
-            await new Promise((r) => setTimeout(r, 1200))
+        const result = await submitRegistration(form)
+        setLoading(false)
+        if (result.success) {
             setSubmitted(true)
-        } catch {
-            setError('Something went wrong. Please try again.')
-        } finally {
-            setLoading(false)
+        } else {
+            setError(result.error ?? 'Something went wrong. Please try again.')
         }
     }
 

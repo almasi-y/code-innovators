@@ -1,10 +1,11 @@
 import { type SchemaTypeDefinition } from 'sanity'
 import hero from '../schemas/hero'
 import sponsorApplication from '../schemas/sponsorApplication'
+import schoolRegistration from '../schemas/schoolRegistration'
 import keynote from '../schemas/keynote'
 import timelinePhase from '../schemas/timelinePhase'
 import domainsSection from '../schemas/domainsSection'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [hero, sponsorApplication, keynote, timelinePhase, domainsSection],
+  types: [hero, sponsorApplication, schoolRegistration, keynote, timelinePhase, domainsSection],
 }

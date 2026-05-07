@@ -6,7 +6,7 @@ import { GlowingEffect } from '@/components/ui/glowing-effect'
 function ArrowIcon({ color }: { color: string }) {
     return (
         <div
-            className="flex items-center justify-center w-36 h-36 sm:w-44 sm:h-44 rounded-3xl shrink-0 p-7"
+            className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-3 sm:p-4 transition-all duration-500 ease-in-out group-hover:scale-110"
             style={{ backgroundColor: color }}
         >
             <svg
@@ -48,7 +48,7 @@ function SponsorCard({
     const hoverDesc = textOnHover === 'black' ? 'group-hover:text-black/60' : 'group-hover:text-white/80'
 
     return (
-        <li className="list-none min-h-[320px] sm:min-h-[360px]">
+        <li className="list-none">
             <div className="relative h-full rounded-[3rem] p-px">
                 <GlowingEffect
                     spread={40}
@@ -59,10 +59,7 @@ function SponsorCard({
                 />
                 <Link
                     href={href}
-                    className={`group relative h-full rounded-[3rem] overflow-hidden bg-white/5 border border-white/30 p-7 sm:p-9 flex flex-row items-center justify-between gap-6 transition-all duration-300`}
-                    style={
-                        { '--hover-bg': hoverBg, '--hover-border': hoverBorder } as React.CSSProperties
-                    }
+                    className={`group relative block h-full rounded-[3rem] overflow-hidden bg-white/5 border border-white/30 p-7 sm:p-9 pb-24 sm:pb-28 transition-all duration-300`}
                     onMouseEnter={(e) => {
                         const el = e.currentTarget
                         el.style.backgroundColor = hoverBg
@@ -74,15 +71,17 @@ function SponsorCard({
                         el.style.borderColor = ''
                     }}
                 >
-                    <div className="flex flex-col gap-8">
-                        <h2 className={`font-display text-3xl sm:text-4xl font-semibold text-white leading-tight transition-colors duration-300 ${hoverText}`}>
+                    <div className="flex flex-col gap-4">
+                        <h2 className={`font-display text-2xl sm:text-3xl md:text-4xl font-semibold text-white leading-tight transition-colors duration-300 ${hoverText}`}>
                             {title}
                         </h2>
-                        <p className={`text-white/50 text-sm leading-relaxed max-w-[200px] transition-colors duration-300 ${hoverDesc}`}>
+                        <p className={`text-white/50 text-sm leading-relaxed transition-colors duration-300 ${hoverDesc}`}>
                             {description}
                         </p>
                     </div>
-                    <ArrowIcon color={arrowColor} />
+                    <div className="absolute bottom-6 right-6">
+                        <ArrowIcon color={arrowColor} />
+                    </div>
                 </Link>
             </div>
         </li>
