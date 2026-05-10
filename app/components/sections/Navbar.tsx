@@ -41,14 +41,8 @@ export default function Navbar() {
                     {/* CTA Buttons — desktop only */}
                     <div className="hidden md:flex items-center gap-3">
                         <Link
-                            href="#register"
-                            className="inline-flex items-center px-5 py-2 rounded-full bg-[#8b7ff5]/70 hover:bg-[#8b7ff5] text-white text-sm font-medium transition-all duration-200 backdrop-blur-sm"
-                        >
-                            Join free
-                        </Link>
-                        <Link
-                            href="#register"
-                            className="inline-flex items-center px-5 py-2 rounded-full bg-[#8b7ff5]/70 hover:bg-[#8b7ff5] text-white text-sm font-bold transition-all duration-200 shadow-lg shadow-[#8b7ff5]/20 backdrop-blur-sm"
+                            href="/register"
+                            className="inline-flex items-center px-6 py-3 rounded-[1.2rem] bg-[#8b7ff5]/70 hover:bg-[#8b7ff5] text-white text-sm font-bold transition-all duration-200 shadow-lg shadow-[#8b7ff5]/20 backdrop-blur-sm"
                         >
                             Buy tickets
                         </Link>
@@ -111,16 +105,9 @@ export default function Navbar() {
                         {/* CTA Buttons at bottom */}
                         <div className="flex flex-col gap-3 mt-8">
                             <Link
-                                href="#register"
+                                href="/register"
                                 onClick={() => setMenuOpen(false)}
-                                className="w-full text-center py-4 rounded-full bg-[#8b7ff5] text-white text-base font-semibold"
-                            >
-                                Join free
-                            </Link>
-                            <Link
-                                href="#register"
-                                onClick={() => setMenuOpen(false)}
-                                className="w-full text-center py-4 rounded-full bg-[#22c55e] text-white text-base font-semibold"
+                                className="w-full text-center py-4 rounded-[1.2rem] bg-[#8b7ff5] text-white text-base font-semibold"
                             >
                                 Buy tickets
                             </Link>

@@ -30,3 +30,10 @@ export const timelineQuery = groq`
     order
   }
 `
+
+export const domainsSectionQuery = groq`
+  *[_type == "domainsSection"][0] {
+    "educationImage": educationImage.asset->url,
+    healthVideoUrl
+  }
+`

@@ -1,11 +1,11 @@
 import { client } from '@/sanity/lib/client'
-import { heroQuery, keynotesQuery } from '@/sanity/lib/queries'
+import { heroQuery, domainsSectionQuery } from '@/sanity/lib/queries'
 import Navbar from './components/sections/Navbar'
 import Hero from './components/sections/Hero'
 import Motto from './components/sections/Motto'
-import Keynotes from './components/sections/Keynotes'
 import FeaturesSectionDemo from '@/components/ui/features-section-demo-3'
 import TimelineDemo from '@/components/timeline-demo'
+import PartnersStrip from '@/components/infinite-moving-cards-demo'
 import Footer from './components/sections/Footer'
 import SponsorCTA from './components/sections/SponsorCTA'
 import FestivalCountdown from './components/sections/FestivalCountdown'
@@ -22,9 +22,9 @@ const fallbackHero = {
 }
 
 export default async function Home() {
-  const [hero, keynotes] = await Promise.all([
+  const [hero, domains] = await Promise.all([
     client.fetch(heroQuery).catch(() => null),
-    client.fetch(keynotesQuery).catch(() => []),
+    client.fetch(domainsSectionQuery).catch(() => null),
   ])
   const data = hero || fallbackHero
 
@@ -45,14 +45,17 @@ export default async function Home() {
 
       <Motto />
 
-      <Keynotes keynotes={keynotes} />
-
-      <FeaturesSectionDemo />
+      <FeaturesSectionDemo
+        educationImage={domains?.educationImage ?? null}
+        healthVideoUrl={domains?.healthVideoUrl ?? null}
+      />
 
       <SponsorCTA />
 
       <TimelineDemo />
-      
+
+      <PartnersStrip />
+
       <Footer />
     </main>
   )

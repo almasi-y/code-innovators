@@ -3,7 +3,6 @@
 import { createClient } from 'next-sanity'
 import { apiVersion, dataset, projectId } from '@/sanity/env'
 
-// Write client — uses the Editor token, never exposed to the browser
 const writeClient = createClient({
     projectId,
     dataset,
@@ -17,7 +16,10 @@ export interface RegistrationFormData {
     contactPerson: string
     email: string
     phone: string
-    teams: string
+    teamName: string
+    thematicArea: string
+    category: string
+    learnerNames: string[]
 }
 
 export async function submitRegistration(data: RegistrationFormData) {
@@ -28,7 +30,10 @@ export async function submitRegistration(data: RegistrationFormData) {
             contactPerson: data.contactPerson,
             email: data.email,
             phone: data.phone || undefined,
-            teams: data.teams,
+            teamName: data.teamName,
+            thematicArea: data.thematicArea,
+            category: data.category,
+            learnerNames: data.learnerNames,
             submittedAt: new Date().toISOString(),
         })
         return { success: true }

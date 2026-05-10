@@ -2,11 +2,11 @@ import Link from 'next/link'
 
 export default function Motto() {
     return (
-        <section className="relative z-10 min-h-screen flex items-start justify-start pt-20 overflow-hidden -mt-px md:items-center md:pt-0" style={{transform:'translateZ(0)'}}>
+        <section className="relative z-10 flex items-start justify-start overflow-hidden -mt-px" style={{transform:'translateZ(0)'}}>
             {/* Gradient overlay — fades in from top so there's no hard line after the Hero */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background" />
 
-            <div className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-16 py-16 md:py-24">
+            <div className="relative z-10 w-full px-4 sm:px-6 md:px-12 lg:px-16 pt-20 pb-10">
                 <div className="w-full max-w-none">
                     {/* Label */}
                     <span className="text-white text-xs sm:text-sm uppercase tracking-widest mb-6 block">

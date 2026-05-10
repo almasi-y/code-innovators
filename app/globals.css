@@ -147,6 +147,17 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@keyframes scroll {
+  to { transform: translate(calc(-50% - 0.5rem)); }
+}
+@-webkit-keyframes scroll {
+  to { -webkit-transform: translate(calc(-50% - 0.5rem)); transform: translate(calc(-50% - 0.5rem)); }
+}
+
+.animate-scroll {
+  animation: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

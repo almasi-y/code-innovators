@@ -4,7 +4,10 @@ import sponsorApplication from '../schemas/sponsorApplication'
 import schoolRegistration from '../schemas/schoolRegistration'
 import keynote from '../schemas/keynote'
 import timelinePhase from '../schemas/timelinePhase'
+import domainsSection from '../schemas/domainsSection'
+import ticket from '../schemas/ticket'
+import coupon from '../schemas/coupon'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [hero, sponsorApplication, schoolRegistration, keynote, timelinePhase],
+  types: [hero, sponsorApplication, schoolRegistration, keynote, timelinePhase, domainsSection, ticket, coupon],
 }
