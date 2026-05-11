@@ -48,7 +48,7 @@ export default function ManifestoPage() {
                     Transforming Young Minds into Solution Creators
                 </h1>
                 <p className="text-white text-[clamp(1.1rem,2.5vw,1.75rem)] leading-[1.4] max-w-4xl font-sans">
-                    Africa is brimming with untapped potential, and at Tech Kidz Africa, we believe this transformation will be driven by innovation, creativity, and the power of technology. Our festival is designed to unleash the ingenuity of students from Grades 4 to Form 4 across private and public schools in Mombasa. This isn't just a festival; it's a launchpad for future innovators, a vibrant hub where young African talents will code with purpose, addressing real-world problems and showcasing the boundless creativity that resides within them.
+                    More than just an event – it&apos;s a strategic investment in the future of our continent, empowering the next generation of African tech innovators.
                 </p>
             </section>
 

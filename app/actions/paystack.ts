@@ -4,11 +4,10 @@ import crypto from 'crypto'
 import { createClient } from 'next-sanity'
 import { apiVersion, dataset, projectId } from '@/sanity/env'
 import { signTicketId } from '@/lib/ticket-token'
+import { getRegistrationFee } from '@/lib/registrationFee'
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY!
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://code-innovators-rho.vercel.app'
-const TICKET_PRICE_KES = 20
-const TICKET_AMOUNT_KOBO = TICKET_PRICE_KES * 100
 
 const writeClient = createClient({
     projectId,
@@ -33,6 +32,7 @@ export interface TicketFormData {
 
 export async function initializeTicketPayment(data: TicketFormData) {
     try {
+        const feeKes = await getRegistrationFee()
         const ticketId = generateTicketId()
         const reference = ticketId
 
@@ -44,7 +44,7 @@ export async function initializeTicketPayment(data: TicketFormData) {
             },
             body: JSON.stringify({
                 email: data.email,
-                amount: TICKET_AMOUNT_KOBO,
+                amount: feeKes * 100,
                 reference,
                 currency: 'KES',
                 callback_url: `${BASE_URL}/tickets/verify`,
@@ -64,7 +64,7 @@ export async function initializeTicketPayment(data: TicketFormData) {
             email: data.email,
             schoolName: data.schoolName || '',
             phone: data.phone || '',
-            amount: TICKET_PRICE_KES,
+            amount: feeKes,
             paystackReference: reference,
             status: 'pending',
             ticketType: 'School Pass',
@@ -91,8 +91,9 @@ export async function verifyTicketPayment(reference: string) {
         }
 
         // Verify correct amount was paid
+        const feeKes = await getRegistrationFee()
         const paidKobo: number = data.data.amount ?? 0
-        if (paidKobo < TICKET_AMOUNT_KOBO) {
+        if (paidKobo < feeKes * 100) {
             return { success: false, error: 'Payment amount is insufficient.' }
         }
 

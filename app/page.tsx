@@ -1,20 +1,20 @@
 import { client } from '@/sanity/lib/client'
-import { heroQuery, domainsSectionQuery } from '@/sanity/lib/queries'
+import { heroQuery, domainsSectionQuery, competitionCategoriesQuery, speakersQuery } from '@/sanity/lib/queries'
 import Navbar from './components/sections/Navbar'
 import Hero from './components/sections/Hero'
 import Motto from './components/sections/Motto'
 import FeaturesSectionDemo from '@/components/ui/features-section-demo-3'
-import TimelineDemo from '@/components/timeline-demo'
 import PartnersStrip from '@/components/infinite-moving-cards-demo'
 import Footer from './components/sections/Footer'
 import SponsorCTA from './components/sections/SponsorCTA'
 import FestivalCountdown from './components/sections/FestivalCountdown'
+import SpeakersSection from './components/sections/SpeakersSection'
 
 // Fallback data when Sanity document hasn't been created yet
 const fallbackHero = {
   title: 'Code Innovation Festival',
-  eventDate: 'Sep 27, 2026',
-  location: 'Mombasa, Kenya',
+  eventDate: 'June 13, 2026',
+  location: 'Khadija Comprehensive',
   format: 'Inter-School Competition',
   backgroundImage: null,
   primaryCta: 'Register Your School',
@@ -22,9 +22,11 @@ const fallbackHero = {
 }
 
 export default async function Home() {
-  const [hero, domains] = await Promise.all([
+  const [hero, domains, categories, speakers] = await Promise.all([
     client.fetch(heroQuery).catch(() => null),
     client.fetch(domainsSectionQuery).catch(() => null),
+    client.fetch(competitionCategoriesQuery).catch(() => null),
+    client.fetch(speakersQuery).catch(() => null),
   ])
   const data = hero || fallbackHero
 
@@ -48,11 +50,13 @@ export default async function Home() {
       <FeaturesSectionDemo
         educationImage={domains?.educationImage ?? null}
         healthVideoUrl={domains?.healthVideoUrl ?? null}
+        technologicalImage={categories?.technologicalImage ?? null}
+        problemSolvingImage={categories?.problemSolvingImage ?? null}
       />
 
       <SponsorCTA />
 
-      <TimelineDemo />
+<SpeakersSection speakers={speakers ?? []} />
 
       <PartnersStrip />
 

@@ -41,6 +41,13 @@ export default defineType({
       validation: (R) => R.required(),
     }),
     defineField({
+      name: 'registrationFee',
+      title: 'Registration Fee (KES)',
+      type: 'number',
+      description: 'Per-student registration fee in KES — e.g. 20',
+      validation: (R) => R.required().min(0),
+    }),
+    defineField({
       name: 'primaryCta',
       title: 'Primary CTA Button Label',
       type: 'string',

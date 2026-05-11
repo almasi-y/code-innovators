@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { completeRegistrationWithPayment } from '@/app/actions/completeRegistration'
 import { redeemCouponAndRegister } from '@/app/actions/redeemCoupon'
+import { getRegistrationFee } from '@/app/actions/getRegistrationFee'
 
 declare global {
     interface Window {
@@ -38,7 +39,6 @@ const THEMATIC_AREAS = {
 type ThematicArea = keyof typeof THEMATIC_AREAS
 
 const MAX_LEARNERS = 5
-const TICKET_AMOUNT_KES = 20
 const PAYSTACK_PUBLIC_KEY = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!
 
 const inputClass = 'h-12 bg-white/5 border-white/10 text-white placeholder:text-white/25 focus-visible:border-[#8b7ff5] focus-visible:ring-[#8b7ff5]/20 rounded-xl text-sm'
@@ -93,9 +93,14 @@ export default function RegisterPage() {
     })
     const [learners, setLearners]       = useState<string[]>(['', ''])
     const [coupon, setCoupon]           = useState('')
-    const [loading, setLoading]         = useState(false)
-    const [statusMessage, setStatusMsg] = useState('')
-    const [error, setError]             = useState<string | null>(null)
+    const [loading, setLoading]           = useState(false)
+    const [statusMessage, setStatusMsg]   = useState('')
+    const [error, setError]               = useState<string | null>(null)
+    const [ticketAmountKes, setTicketAmountKes] = useState(20)
+
+    useEffect(() => {
+        getRegistrationFee().then(setTicketAmountKes)
+    }, [])
 
     const categories = form.thematicArea ? THEMATIC_AREAS[form.thematicArea] : []
     const hasCoupon  = coupon.trim().length > 0
@@ -212,7 +217,7 @@ export default function RegisterPage() {
 
         window.PaystackPop.setup({
             key: PAYSTACK_PUBLIC_KEY, email: form.email,
-            amount: TICKET_AMOUNT_KES * 100, currency: 'KES',
+            amount: ticketAmountKes * 100, currency: 'KES',
             ref: `REG-${rand}`,
             metadata: { schoolName: form.schoolName, contactPerson: form.contactPerson, teamName: form.teamName },
             callback(response) {
@@ -433,7 +438,7 @@ export default function RegisterPage() {
                                         <input
                                             value={coupon}
                                             onChange={e => setCoupon(e.target.value.toUpperCase())}
-                                            placeholder="Enter code for free registration"
+                                            placeholder="Enter code"
                                             className="w-full h-14 bg-white/5 border border-white/10 text-white text-base placeholder:text-white/25 rounded-2xl px-4 font-mono tracking-wider focus:outline-none focus:border-[#8b7ff5] transition-colors"
                                         />
                                     </div>
@@ -455,7 +460,7 @@ export default function RegisterPage() {
                     {step === 4 ? (
                         <button onClick={handlePay} disabled={loading}
                             className="w-full py-4 rounded-2xl bg-[#8b7ff5] hover:bg-[#7a6ee0] disabled:opacity-50 text-white font-bold text-base transition-all shadow-lg shadow-[#8b7ff5]/25">
-                            {hasCoupon ? 'Redeem Coupon & Register' : `Pay KES ${TICKET_AMOUNT_KES} & Register`}
+                            {hasCoupon ? 'Redeem Coupon & Register' : `Pay KES ${ticketAmountKes} & Register`}
                         </button>
                     ) : (
                         <button onClick={step === 3 ? goNextStep : mobileNext}
@@ -478,7 +483,7 @@ export default function RegisterPage() {
                             Register Your<br />School
                         </h1>
                         <p className="mt-4 text-white/50 text-sm sm:text-base max-w-md">
-                            Registration fee: <span className="text-white font-semibold">KES {TICKET_AMOUNT_KES.toLocaleString()} per student</span>.
+                            Registration fee: <span className="text-white font-semibold">KES {ticketAmountKes.toLocaleString()} per student</span>.
                             You&apos;ll receive a ticket immediately after payment.
                         </p>
                     </div>
@@ -596,13 +601,13 @@ export default function RegisterPage() {
                                         <div className="flex flex-col gap-2">
                                             <label className={labelClass}>Coupon Code <span className="text-white/25 normal-case">(optional)</span></label>
                                             <Input value={coupon} onChange={e => setCoupon(e.target.value.toUpperCase())}
-                                                placeholder="Enter code for free registration"
+                                                placeholder="Enter code"
                                                 className={inputClass + ' font-mono tracking-wider'} />
                                             <p className="text-white/25 text-xs">Have a coupon? No payment required.</p>
                                         </div>
                                         <button onClick={handlePay} disabled={loading}
                                             className="w-full py-4 rounded-2xl bg-[#8b7ff5] hover:bg-[#7a6ee0] disabled:opacity-50 text-white font-bold text-base transition-all shadow-lg shadow-[#8b7ff5]/25">
-                                            {hasCoupon ? 'Redeem Coupon & Register' : `Pay KES ${TICKET_AMOUNT_KES} & Register`}
+                                            {hasCoupon ? 'Redeem Coupon & Register' : `Pay KES ${ticketAmountKes} & Register`}
                                         </button>
                                     </>}
                                 </motion.div>

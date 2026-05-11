@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useTimer } from "react-timer-hook";
 
-// Festival date: September 27, 2026 at 08:00 EAT (UTC+3) = 05:00 UTC
+// Festival date: June 13, 2026 at 08:00 EAT (UTC+3) = 05:00 UTC
 // Using Date.UTC to avoid iOS Safari rejecting the +03:00 offset in ISO strings
-const FESTIVAL_DATE = new Date(Date.UTC(2026, 8, 27, 5, 0, 0));
+const FESTIVAL_DATE = new Date(Date.UTC(2026, 5, 13, 5, 0, 0));
 
 interface TimeUnitProps {
   value: number;
@@ -110,11 +110,6 @@ export default function FestivalCountdown() {
           >
             {hasExpired ? "The Festival Has Begun!" : "Countdown to Festival Day"}
           </h2>
-          <p className="text-white/50 text-sm sm:text-base max-w-md">
-            {hasExpired
-              ? "Code Innovators Festival 2026 is happening right now in Mombasa, Kenya."
-              : "Code Innovators Festival · 27 September 2026 · Mombasa, Kenya"}
-          </p>
         </div>
 
         {/* Digit row – only rendered client-side to avoid hydration mismatch */}

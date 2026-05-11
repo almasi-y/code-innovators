@@ -25,22 +25,23 @@ export default function CheckInPage({
     const [checkedIn, setCheckedIn] = useState(false)
     const [checkInError, setCheckInError] = useState('')
     const [isPending, startTransition] = useTransition()
+    const [autoChecking, setAutoChecking] = useState(false)
 
-    // Restore cached PIN so admins don't re-enter for every scan
+    // Restore cached PIN so admins don't re-enter for every scan.
+    // Uses its own loading state so the Verify button stays active.
     useEffect(() => {
         const saved = sessionStorage.getItem(PIN_KEY)
-        if (saved) {
-            setPin(saved)
-            startTransition(async () => {
-                const r = await getTicketForCheckIn(ticketId, token, saved)
-                if (r.status !== 'invalid_pin') {
-                    setResult(r)
-                    setPhase('result')
-                } else {
-                    sessionStorage.removeItem(PIN_KEY)
-                }
-            })
-        }
+        if (!saved) return
+        setPin(saved)
+        setAutoChecking(true)
+        getTicketForCheckIn(ticketId, token, saved).then((r) => {
+            if (r.status !== 'invalid_pin') {
+                setResult(r)
+                setPhase('result')
+            } else {
+                sessionStorage.removeItem(PIN_KEY)
+            }
+        }).finally(() => setAutoChecking(false))
     }, [ticketId, token])
 
     function handlePinSubmit(e: React.FormEvent) {
@@ -64,8 +65,8 @@ export default function CheckInPage({
             const r = await checkInTicket(ticketId, token, pin)
             if (r.success) {
                 setCheckedIn(true)
-                const updated = await getTicketForCheckIn(ticketId, token, pin)
-                setResult(updated)
+                // Do NOT re-fetch — the ticket now reads as 'already_checked_in' in Sanity,
+                // which would incorrectly show the red error screen.
             } else {
                 setCheckInError(r.error ?? 'Check-in failed.')
             }
@@ -92,6 +93,7 @@ export default function CheckInPage({
                             autoFocus
                         />
                         {pinError && <p className="text-red-400 text-xs text-center">{pinError}</p>}
+                        {autoChecking && <p className="text-white/30 text-xs text-center">Checking saved PIN…</p>}
                         <button
                             type="submit"
                             disabled={isPending || !pin}
@@ -106,16 +108,18 @@ export default function CheckInPage({
     }
 
     // ── Result screen ────────────────────────────────────────────
-    const isAlreadyIn = result?.status === 'already_checked_in' || (result?.status === 'valid' && checkedIn)
+    const justCheckedIn = checkedIn
+    const wasAlreadyIn = result?.status === 'already_checked_in' && !justCheckedIn
     const isInvalid = !result || result.status === 'invalid_ticket' || result.status === 'not_paid'
 
-    const bgColor = isInvalid ? 'bg-[#1a1a2e]' : isAlreadyIn ? 'bg-red-950' : 'bg-green-950'
-    const borderColor = isInvalid ? 'border-white/10' : isAlreadyIn ? 'border-red-500/40' : 'border-green-500/40'
+    const bgColor = isInvalid ? 'bg-[#1a1a2e]' : wasAlreadyIn ? 'bg-red-950' : 'bg-green-950'
+    const borderColor = isInvalid ? 'border-white/10' : wasAlreadyIn ? 'border-red-500/40' : 'border-green-500/40'
     const statusLabel = isInvalid
         ? (result?.status === 'not_paid' ? 'NOT PAID' : 'INVALID')
-        : isAlreadyIn ? 'ALREADY CHECKED IN' : 'VALID'
-    const statusColor = isInvalid ? 'text-white/60' : isAlreadyIn ? 'text-red-400' : 'text-green-400'
-    const iconBg = isInvalid ? 'bg-white/10' : isAlreadyIn ? 'bg-red-500/20' : 'bg-green-500/20'
+        : wasAlreadyIn ? 'ALREADY CHECKED IN'
+        : justCheckedIn ? 'CHECKED IN ✓' : 'VALID'
+    const statusColor = isInvalid ? 'text-white/60' : wasAlreadyIn ? 'text-red-400' : 'text-green-400'
+    const iconBg = isInvalid ? 'bg-white/10' : wasAlreadyIn ? 'bg-red-500/20' : 'bg-green-500/20'
 
     return (
         <div className="h-dvh bg-[#0f0f1a] flex flex-col items-center justify-center p-6 overflow-hidden">
@@ -129,7 +133,7 @@ export default function CheckInPage({
                         <svg className="w-7 h-7 text-white/40" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                    ) : isAlreadyIn ? (
+                    ) : wasAlreadyIn ? (
                         <svg className="w-7 h-7 text-red-400" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
                         </svg>
@@ -153,11 +157,14 @@ export default function CheckInPage({
                             </>
                         )}
                         {'ticketType' in result && <Row label="Type" value={result.ticketType} />}
+                        {'studentCount' in result && result.studentCount !== null && (
+                            <Row label="Students" value={`${result.studentCount}`} />
+                        )}
                         <Row label="Ticket ID" value={ticketId} mono />
-                        {result.status === 'already_checked_in' && result.checkedInAt && (
+                        {wasAlreadyIn && result.status === 'already_checked_in' && result.checkedInAt && (
                             <Row label="Checked in at" value={new Date(result.checkedInAt).toLocaleTimeString()} />
                         )}
-                        {checkedIn && result.status !== 'already_checked_in' && (
+                        {justCheckedIn && (
                             <Row label="Checked in at" value={new Date().toLocaleTimeString()} />
                         )}
                     </div>

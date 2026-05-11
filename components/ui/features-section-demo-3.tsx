@@ -9,6 +9,8 @@ import {
 type Props = {
   educationImage?: string | null;
   healthVideoUrl?: string | null;
+  technologicalImage?: string | null;
+  problemSolvingImage?: string | null;
 };
 
 type BulletItem = { text: string; Icon: React.ElementType };
@@ -44,22 +46,25 @@ const PROBLEM_BULLETS: BulletItem[] = [
   { Icon: Leaf,          text: "Solutions for climate change, waste management, conservation, renewable energy, pollution control, etc." },
 ];
 
-const CATEGORIES = [
-  {
-    category: "Category 01",
-    title: "Technological",
-    src: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=2669&auto=format&fit=crop",
-    content: <CategoryContent bullets={TECH_BULLETS} />,
-  },
-  {
-    category: "Category 02",
-    title: "Problem Solving",
-    src: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop",
-    content: <CategoryContent bullets={PROBLEM_BULLETS} />,
-  },
-];
+const FALLBACK_TECH_IMAGE = "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=2669&auto=format&fit=crop";
+const FALLBACK_PROBLEM_IMAGE = "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop";
 
-export default function FeaturesSectionDemo(_props: Props) {
+export default function FeaturesSectionDemo({ technologicalImage, problemSolvingImage }: Props) {
+  const CATEGORIES = [
+    {
+      category: "Category 01",
+      title: "Technological",
+      src: technologicalImage || FALLBACK_TECH_IMAGE,
+      content: <CategoryContent bullets={TECH_BULLETS} />,
+    },
+    {
+      category: "Category 02",
+      title: "Problem Solving",
+      src: problemSolvingImage || FALLBACK_PROBLEM_IMAGE,
+      content: <CategoryContent bullets={PROBLEM_BULLETS} />,
+    },
+  ];
+
   const cards = CATEGORIES.map((card, index) => (
     <Card key={card.src} card={card} index={index} layout />
   ));

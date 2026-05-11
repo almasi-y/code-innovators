@@ -8,7 +8,8 @@ export const heroQuery = groq`
     format,
     "backgroundImage": backgroundImage.asset->url,
     primaryCta,
-    secondaryCta
+    secondaryCta,
+    registrationFee
   }
 `
 
@@ -35,5 +36,21 @@ export const domainsSectionQuery = groq`
   *[_type == "domainsSection"][0] {
     "educationImage": educationImage.asset->url,
     healthVideoUrl
+  }
+`
+
+export const speakersQuery = groq`
+  *[_type == "speaker"] | order(order asc) {
+    _id,
+    name,
+    role,
+    "photo": photo.asset->url,
+  }
+`
+
+export const competitionCategoriesQuery = groq`
+  *[_type == "competitionCategories"][0] {
+    "technologicalImage": technologicalImage.asset->url,
+    "problemSolvingImage": problemSolvingImage.asset->url,
   }
 `

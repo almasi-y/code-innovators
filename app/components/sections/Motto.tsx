@@ -20,7 +20,7 @@ export default function Motto() {
                             textShadow: '0 2px 40px rgba(0,0,0,0.4)',
                         }}
                     >
-                        More than just an event – it&apos;s a strategic investment in the future of our continent, empowering the next generation of African tech innovators.
+                        Africa&apos;s youngest generation is ready to redefine the continent&apos;s destiny — Tech Kidz Africa challenges students from Grades 4 to Form 4 across Mombasa to stop consuming technology and start building real solutions to real problems.
                     </h2>
 
                     {/* Manifesto pill */}

@@ -13,7 +13,7 @@ export default function PartnersStrip() {
       <div className="max-w-7xl px-4 mx-auto mb-10">
         <span className="text-white/40 text-xs uppercase tracking-widest">Our Partners</span>
       </div>
-      <InfiniteMovingCards items={LOGOS} direction="left" speed="fast" />
+      <InfiniteMovingCards items={LOGOS} direction="left" speed="slow" />
     </section>
   );
 }

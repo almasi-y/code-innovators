@@ -6,10 +6,9 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 
 const navLinks = [
+    { label: 'About', href: '/about' },
     { label: 'Schedule', href: '#schedule' },
     { label: 'Speakers', href: '#speakers' },
-    { label: 'FAQs', href: '#faqs' },
-    { label: 'Resources', href: '#resources' },
 ]
 
 export default function Navbar() {

@@ -4,9 +4,9 @@ import crypto from 'crypto'
 import { createClient } from 'next-sanity'
 import { apiVersion, dataset, projectId } from '@/sanity/env'
 import { signTicketId } from '@/lib/ticket-token'
+import { getRegistrationFee } from '@/lib/registrationFee'
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY!
-const TICKET_AMOUNT_KES = 20 // change to 1000 for production
 
 const writeClient = createClient({
     projectId,
@@ -50,8 +50,9 @@ export async function completeRegistrationWithPayment(
         }
 
         // 2. Verify the amount paid is correct (prevents underpayment attacks)
+        const feeKes = await getRegistrationFee()
         const paidKobo: number = paystackData.data.amount ?? 0
-        if (paidKobo < TICKET_AMOUNT_KES * 100) {
+        if (paidKobo < feeKes * 100) {
             return { success: false, error: 'Payment amount is insufficient.' }
         }
 
@@ -93,7 +94,7 @@ export async function completeRegistrationWithPayment(
             email: data.email,
             schoolName: data.schoolName,
             phone: data.phone || '',
-            amount: TICKET_AMOUNT_KES,
+            amount: feeKes,
             paystackReference,
             status: 'paid',
             ticketType: 'School Pass',
