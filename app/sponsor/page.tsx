@@ -305,6 +305,7 @@ export default function SponsorPage() {
                                                     placeholder={currentField.placeholder}
                                                     onKeyDown={e => e.key === 'Enter' && mobileNext()}
                                                     className="w-full h-14 bg-white/5 border border-white/10 text-white text-base placeholder:text-white/25 rounded-2xl px-4 focus:outline-none focus:border-[#8b7ff5] transition-colors"
+                                                    suppressHydrationWarning
                                                 />
                                             )}
                                         </>

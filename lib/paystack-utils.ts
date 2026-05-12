@@ -5,5 +5,9 @@ export function verifyWebhookSignature(rawBody: string, signature: string): bool
         .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY!)
         .update(rawBody)
         .digest('hex')
-    return hash === signature
+    try {
+        return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(signature, 'hex'))
+    } catch {
+        return false
+    }
 }

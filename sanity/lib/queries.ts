@@ -6,7 +6,7 @@ export const heroQuery = groq`
     eventDate,
     location,
     format,
-    "backgroundImage": backgroundImage.asset->url,
+    "backgroundImage": backgroundImage.asset->url + "?w=1920&auto=format&fit=max&q=80",
     primaryCta,
     secondaryCta,
     registrationFee
@@ -50,7 +50,10 @@ export const speakersQuery = groq`
 
 export const competitionCategoriesQuery = groq`
   *[_type == "competitionCategories"][0] {
-    "technologicalImage": technologicalImage.asset->url,
-    "problemSolvingImage": problemSolvingImage.asset->url,
+    "categories": categories[] {
+      name,
+      "image": image.asset->url + "?w=1600&auto=format&fit=crop&q=95",
+      bullets
+    }
   }
 `

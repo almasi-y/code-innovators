@@ -9,57 +9,29 @@ export const metadata = {
 
 const packages = [
     {
-        tier: 'Bronze',
-        price: 'KES 50,000',
-        color: '#cd7f32',
-        perks: [
-            'Logo on event website',
-            'Social media mention (×1)',
-            '2 complimentary passes',
-            'Programme booklet listing',
-        ],
-    },
-    {
-        tier: 'Silver',
-        price: 'KES 120,000',
-        color: '#a8a9ad',
-        perks: [
-            'All Bronze benefits',
-            'Logo on banners & stage backdrop',
-            'Social media mentions (×3)',
-            '5 complimentary passes',
-            'Exhibition table (1 m²)',
-        ],
-    },
-    {
-        tier: 'Gold',
-        price: 'KES 250,000',
-        color: '#f5c842',
-        perks: [
-            'All Silver benefits',
-            'Speaking slot (10 min)',
-            'Premium banner placement',
-            'Social media mentions (×6)',
-            '10 complimentary passes',
-            'Exhibition booth (4 m²)',
-            'Brand on all printed materials',
-        ],
+        tier: 'Title Sponsor',
+        price: 'KES 5,000,000',
+        color: '#FFD700',
         featured: true,
+        description: 'It caters for both the hackathon and the Code Innovators Festival. This exclusive partner will have their name and logo prominently featured as the official "Title Sponsor" across all event branding, including the main stage, all digital and physical materials, and dedicated media spotlights. This package includes a prime keynote speaker slot at the opening or closing ceremony, exclusive branding on all participant kits, merchandise, and awards, and a premium, oversized exhibition space.',
     },
     {
-        tier: 'Platinum',
-        price: 'KES 500,000',
+        tier: 'Platinum Innovator',
+        price: 'KES 1,000,000',
         color: '#8b7ff5',
-        perks: [
-            'All Gold benefits',
-            'Title sponsorship credit',
-            'Keynote introduction slot',
-            'Full-page programme ad',
-            'Social media mentions (×12)',
-            '20 complimentary passes',
-            'Exclusive networking dinner seat',
-            'Award category naming rights',
-        ],
+        description: 'It covers both the hackathon and the Code Innovators Festival, providing prominent branding across all event materials, media, and stage presence. This includes a keynote speaker slot, exclusive branding on participant kits and merchandise, a dedicated exhibition space, involvement in the judging panel, and collaboration on joint press releases and social media campaigns.',
+    },
+    {
+        tier: 'Gold Creator',
+        price: 'KES 700,000',
+        color: '#f5c842',
+        description: 'It caters for both the hackathon and the Code Innovators Festival, offering high-visibility branding across all event materials and media, a speaking opportunity during a dedicated segment, a prominent exhibition space, and inclusion in all event press releases.',
+    },
+    {
+        tier: 'Silver Builder',
+        price: 'KES 400,000',
+        color: '#a8a9ad',
+        description: "You'll receive branding on selected event materials, recognition during the ceremony, exhibition space, and social media mentions.",
     },
 ]
 
@@ -83,48 +55,36 @@ export default function SponsorshipPackagesPage() {
                 </div>
 
                 {/* Package cards grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-16">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-16">
                     {packages.map((pkg) => (
                         <div
                             key={pkg.tier}
                             className={`relative flex flex-col rounded-3xl border p-7 transition-all duration-300 ${
                                 pkg.featured
-                                    ? 'border-[#f5c842]/40 bg-[#f5c842]/5'
+                                    ? 'border-white/20 bg-white/5'
                                     : 'border-white/10 bg-white/5'
                             }`}
+                            style={pkg.featured ? { borderColor: pkg.color + '50' } : {}}
                         >
                             {pkg.featured && (
-                                <span className="absolute -top-3 left-7 bg-[#f5c842] text-black text-xs font-bold px-3 py-1 rounded-full">
-                                    Most Popular
+                                <span className="absolute -top-3 left-7 text-black text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: pkg.color }}>
+                                    Premier
                                 </span>
                             )}
 
-                            {/* Tier badge */}
-                            <div
-                                className="w-10 h-10 rounded-xl mb-6 flex items-center justify-center shrink-0"
-                                style={{ backgroundColor: pkg.color + '33' }}
-                            >
-                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: pkg.color }} />
+                            <div className="flex items-start justify-between gap-4 mb-4">
+                                <h2
+                                    className="font-display text-2xl font-bold"
+                                    style={{ color: pkg.color }}
+                                >
+                                    {pkg.tier}
+                                </h2>
+                                <p className="text-white text-lg font-bold shrink-0">{pkg.price}</p>
                             </div>
 
-                            <h2
-                                className="font-display text-2xl font-semibold mb-1"
-                                style={{ color: pkg.color }}
-                            >
-                                {pkg.tier}
-                            </h2>
-                            <p className="text-white text-xl font-bold mb-6">{pkg.price}</p>
-
-                            <ul className="flex flex-col gap-2.5 mb-8 flex-1">
-                                {pkg.perks.map((perk) => (
-                                    <li key={perk} className="flex items-start gap-2 text-white/70 text-sm">
-                                        <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 mt-0.5 shrink-0" style={{ color: pkg.color }}>
-                                            <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z" />
-                                        </svg>
-                                        {perk}
-                                    </li>
-                                ))}
-                            </ul>
+                            <p className="text-white/60 text-sm leading-relaxed flex-1 mb-6">
+                                {pkg.description}
+                            </p>
 
                             <Link
                                 href="/sponsor"

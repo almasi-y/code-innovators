@@ -224,8 +224,6 @@ export const Card = ({
       document.body
       )}
       <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
         onClick={handleOpen}
         className="relative z-10 flex h-[32rem] w-72 flex-col items-start justify-start overflow-hidden rounded-3xl bg-gray-100 md:h-[52rem] md:w-[30rem] dark:bg-neutral-900"
       >
@@ -238,16 +236,6 @@ export const Card = ({
             <p className="mt-2 max-w-xs text-left font-sans text-xl font-semibold [text-wrap:balance] text-white md:text-3xl">
               {card.title}
             </p>
-          </div>
-          <div className="mt-6">
-            <MovingBorderButton
-              as="div"
-              borderRadius="1rem"
-              duration={3000}
-              className="bg-black/40 backdrop-blur-sm text-white text-sm font-medium px-5 py-2 border-white/20 pointer-events-none"
-            >
-              Tap to explore →
-            </MovingBorderButton>
           </div>
         </div>
         <BlurImage

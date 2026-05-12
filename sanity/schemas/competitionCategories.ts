@@ -6,18 +6,38 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
-      name: 'technologicalImage',
-      title: 'Technological Category Image',
-      type: 'image',
-      options: { hotspot: true },
-      description: 'Image shown on the "Technological" category card',
-    }),
-    defineField({
-      name: 'problemSolvingImage',
-      title: 'Problem Solving Category Image',
-      type: 'image',
-      options: { hotspot: true },
-      description: 'Image shown on the "Problem Solving" category card',
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'name',
+              title: 'Category Name',
+              type: 'string',
+              description: 'e.g. "Technological" or "Problem Solving"',
+            }),
+            defineField({
+              name: 'image',
+              title: 'Cover Image',
+              type: 'image',
+              options: { hotspot: true },
+            }),
+            defineField({
+              name: 'bullets',
+              title: 'Description Points',
+              type: 'array',
+              of: [{ type: 'string' }],
+              description: 'Each point appears as a bullet on the category card',
+            }),
+          ],
+          preview: {
+            select: { title: 'name', media: 'image' },
+          },
+        },
+      ],
     }),
   ],
   preview: {

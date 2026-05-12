@@ -23,7 +23,7 @@ const fallbackHero = {
 
 export default async function Home() {
   const [hero, domains, categories, speakers] = await Promise.all([
-    client.fetch(heroQuery).catch(() => null),
+    client.fetch(heroQuery, {}, { cache: 'no-store' }).catch(() => null),
     client.fetch(domainsSectionQuery).catch(() => null),
     client.fetch(competitionCategoriesQuery).catch(() => null),
     client.fetch(speakersQuery).catch(() => null),
@@ -50,8 +50,7 @@ export default async function Home() {
       <FeaturesSectionDemo
         educationImage={domains?.educationImage ?? null}
         healthVideoUrl={domains?.healthVideoUrl ?? null}
-        technologicalImage={categories?.technologicalImage ?? null}
-        problemSolvingImage={categories?.problemSolvingImage ?? null}
+        categories={categories?.categories ?? []}
       />
 
       <SponsorCTA />

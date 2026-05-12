@@ -37,11 +37,38 @@ export interface RegistrationPayload {
     teams: TeamData[]
 }
 
+const MAX_TEAMS    = 3
+const MAX_LEARNERS = 5
+
+function validatePayload(data: RegistrationPayload): string | null {
+    if (!data.schoolName?.trim())    return 'School name is required.'
+    if (!data.contactPerson?.trim()) return 'Contact person is required.'
+    if (!data.email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return 'Valid email is required.'
+    if (!Array.isArray(data.teams) || data.teams.length < 1) return 'At least one team is required.'
+    if (data.teams.length > MAX_TEAMS) return `Maximum ${MAX_TEAMS} teams allowed.`
+    for (const team of data.teams) {
+        if (!team.teamName?.trim()) return 'Each team must have a name.'
+        if (!team.category?.trim()) return 'Each team must have a category.'
+        if (!team.thematicArea?.trim()) return 'Each team must have a thematic area.'
+        if (!Array.isArray(team.learnerNames) || team.learnerNames.length < 1) return 'Each team must have at least one learner.'
+        if (team.learnerNames.length > MAX_LEARNERS) return `Maximum ${MAX_LEARNERS} learners per team.`
+    }
+    return null
+}
+
 export async function completeRegistrationWithPayment(
     paystackReference: string,
     data: RegistrationPayload
 ) {
     try {
+        // 0. Validate payload structure before touching Paystack
+        const validationError = validatePayload(data)
+        if (validationError) return { success: false, error: validationError }
+
+        if (!/^[A-Za-z0-9_-]{4,100}$/.test(paystackReference)) {
+            return { success: false, error: 'Invalid payment reference.' }
+        }
+
         // 1. Verify payment with Paystack
         const res = await fetch(
             `https://api.paystack.co/transaction/verify/${encodeURIComponent(paystackReference)}`,
@@ -53,20 +80,26 @@ export async function completeRegistrationWithPayment(
             return { success: false, error: 'Payment could not be verified. Please contact support.' }
         }
 
-        // 2. Verify amount (feePerLearner × totalLearners)
-        const feeKes       = await getRegistrationFee()
+        // 2. Verify the email on the Paystack transaction matches the registration email
+        const paystackEmail: string = paystackData.data?.customer?.email ?? ''
+        if (paystackEmail.toLowerCase() !== data.email.trim().toLowerCase()) {
+            return { success: false, error: 'Payment email does not match registration email.' }
+        }
+
+        // 3. Verify amount (feePerLearner × totalLearners)
+        const feeKes        = await getRegistrationFee()
         const totalLearners = data.teams.reduce((s, t) => s + t.learnerNames.length, 0)
         const paidKobo: number = paystackData.data.amount ?? 0
         if (paidKobo < feeKes * totalLearners * 100) {
             return { success: false, error: 'Payment amount is insufficient.' }
         }
 
-        // 3. Verify currency
+        // 4. Verify currency
         if (paystackData.data.currency !== 'KES') {
             return { success: false, error: 'Invalid payment currency.' }
         }
 
-        // 4. Prevent reference reuse
+        // 5. Prevent reference reuse
         const alreadyUsed = await writeClient.fetch<{ _id: string } | null>(
             `*[_type == "ticket" && paystackReference == $ref && status == "paid"][0]{ _id }`,
             { ref: paystackReference }

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
 }
 
 // Clash Display for titles and hero
@@ -150,8 +151,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={cn(GeistSans.variable, clashDisplay.variable, jetbrainsMono.variable, "font-sans", geist.variable, "dark")}>
-      <body className="font-sans bg-background text-foreground">{children}</body>
+    <html lang="en" className={cn(GeistSans.variable, clashDisplay.variable, jetbrainsMono.variable, "font-sans", geist.variable, "dark")} suppressHydrationWarning>
+      <body className="font-sans bg-background text-foreground" suppressHydrationWarning>{children}</body>
     </html>
   )
 }

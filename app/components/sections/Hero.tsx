@@ -32,6 +32,7 @@ export default function Hero({
                         className="object-cover"
                         priority
                         quality={90}
+                        sizes="100vw"
                     />
                     {/* Purple tint overlay */}
                     <div className="absolute inset-0 bg-overlay-purple" />

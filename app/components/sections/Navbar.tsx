@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 
 const navLinks = [
@@ -13,15 +13,36 @@ const navLinks = [
 
 export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false)
+    const [scrolled, setScrolled] = useState(false)
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 40)
+        window.addEventListener('scroll', onScroll, { passive: true })
+        return () => window.removeEventListener('scroll', onScroll)
+    }, [])
 
     return (
         <>
-            <nav className="absolute top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-12 py-2">
-                <div className="flex items-center justify-between">
+            <nav
+                className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-12 pb-0 sm:py-2"
+                style={{ paddingTop: 'max(env(safe-area-inset-top), 8px)' }}
+            >
+                {/* Blur background as its own layer — keeps iOS from hiding nav children */}
+                <div
+                    className={`absolute inset-0 transition-all duration-300 ${scrolled ? 'bg-black/60 shadow-md shadow-black/30' : 'bg-transparent'}`}
+                    style={{ WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none', backdropFilter: scrolled ? 'blur(12px)' : 'none' }}
+                />
+                <div className="relative z-10 flex items-center justify-between">
                     {/* Left side: logo + nav links */}
                     <div className="flex items-center gap-8">
                         <Link href="/" className="flex items-center shrink-0">
-                            <Image src="/logo.svg" alt="Logo" width={170} height={170} className="w-[90px] h-[90px] sm:w-[110px] sm:h-[110px] md:w-[110px] md:h-[110px]" />
+                            <Image
+                                src="/logo.svg"
+                                alt="Logo"
+                                width={170}
+                                height={170}
+                                className="w-[90px] h-[90px] sm:w-[110px] sm:h-[110px] md:w-[110px] md:h-[110px]"
+                            />
                         </Link>
                         <ul className="hidden md:flex items-center gap-8">
                             {navLinks.map((link) => (
