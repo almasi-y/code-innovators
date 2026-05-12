@@ -34,11 +34,12 @@ export default defineType({
       validation: (R) => R.required(),
     }),
     defineField({
-      name: 'backgroundImage',
-      title: 'Hero Background Image',
-      type: 'image',
-      options: { hotspot: true },
-      validation: (R) => R.required(),
+      name: 'backgroundImages',
+      title: 'Hero Background Images',
+      type: 'array',
+      of: [{ type: 'image', options: { hotspot: true } }],
+      description: 'Add 2+ images — they will slide every 3 seconds',
+      validation: (R) => R.required().min(1),
     }),
     defineField({
       name: 'registrationFee',

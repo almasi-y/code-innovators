@@ -38,7 +38,7 @@ export default async function Home() {
         eventDate={data.eventDate}
         location={data.location}
         format={data.format}
-        backgroundImage={data.backgroundImage}
+        backgroundImages={(data.backgroundImages ?? []).filter((u: string | null): u is string => !!u)}
         primaryCta={data.primaryCta}
         secondaryCta={data.secondaryCta}
       />

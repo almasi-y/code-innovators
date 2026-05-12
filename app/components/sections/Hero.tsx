@@ -1,6 +1,7 @@
 "use client"
 
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { TypewriterEffectSmooth } from '@/components/ui/typewriter-effect'
 
 interface HeroProps {
@@ -8,7 +9,7 @@ interface HeroProps {
     eventDate: string
     location: string
     format: string
-    backgroundImage: string | null
+    backgroundImages: string[]
     primaryCta?: string
     secondaryCta?: string
 }
@@ -18,27 +19,44 @@ export default function Hero({
     eventDate,
     location,
     format,
-    backgroundImage,
+    backgroundImages,
 }: HeroProps) {
+    const [current, setCurrent] = useState(0)
+
+    useEffect(() => {
+        if (backgroundImages.length < 2) return
+        const id = setInterval(() => {
+            setCurrent(i => (i + 1) % backgroundImages.length)
+        }, 3000)
+        return () => clearInterval(id)
+    }, [backgroundImages.length])
+
     return (
         <section className="relative min-h-[100dvh] w-full overflow-hidden">
-            {/* Background image — absolute so it scrolls out of view as the user scrolls */}
-            {backgroundImage ? (
+            {/* Background images — crossfade slideshow */}
+            {backgroundImages.length > 0 ? (
                 <div className="absolute inset-0 -z-10">
-                    <Image
-                        src={backgroundImage}
-                        alt={title}
-                        fill
-                        className="object-cover"
-                        priority
-                        quality={90}
-                        sizes="100vw"
-                    />
-                    {/* Purple tint overlay */}
+                    {backgroundImages.map((src, i) => (
+                        <div
+                            key={src}
+                            className="absolute inset-0 transition-opacity duration-1000"
+                            style={{ opacity: i === current ? 1 : 0 }}
+                        >
+                            <Image
+                                src={`${src}?w=1920&auto=format&fit=max&q=80`}
+                                alt={title}
+                                fill
+                                className="object-cover"
+                                priority={i === 0}
+                                quality={90}
+                                sizes="100vw"
+                                unoptimized
+                            />
+                        </div>
+                    ))}
                     <div className="absolute inset-0 bg-overlay-purple" />
                 </div>
             ) : (
-                /* Fallback gradient when no image is set yet */
                 <div className="absolute inset-0 -z-10">
                     <div className="absolute inset-0 bg-gradient-to-br from-[#222222] via-[#1a1a1a] to-background" />
                     <div className="absolute inset-0 bg-black/30" />
@@ -48,13 +66,11 @@ export default function Hero({
             {/* Hero Content — Bottom-left aligned */}
             <div className="relative z-10 flex flex-col justify-end min-h-[100dvh] pb-24 sm:pb-32 lg:pb-10 px-4 sm:px-6 md:px-12 lg:px-16">
                 <div className="w-full">
-                    {/* Typewriter title — two lines like the original layout */}
                     {(() => {
                         const allWords = title.trim().split(' ')
                         const lastWord = allWords.pop()!
                         return (
                             <div className="mb-6 sm:mb-8">
-                                {/* Line 1: "Code Innovators" */}
                                 <TypewriterEffectSmooth
                                     words={allWords.map((word) => ({
                                         text: word,
@@ -63,7 +79,6 @@ export default function Hero({
                                     className="font-display"
                                     cursorClassName="hidden"
                                 />
-                                {/* Line 2: "Festival" */}
                                 <TypewriterEffectSmooth
                                     words={[{
                                         text: lastWord,
@@ -76,9 +91,7 @@ export default function Hero({
                         )
                     })()}
 
-                    {/* Pills — stacked rows like reference: date on first row, location + format below */}
                     <div className="flex flex-col gap-3">
-                        {/* Mobile: each pill full-width stacked | Desktop: row 1 date+location, row 2 format */}
                         <div className="flex flex-col md:flex-row md:flex-wrap md:items-center gap-3">
                             <span className="bg-[#8b7ff5] text-white font-bold text-center
                                 w-full md:w-auto
@@ -111,7 +124,22 @@ export default function Hero({
                 </div>
             </div>
 
-            {/* Bottom fade into next section */}
+            {/* Slide indicators */}
+            {backgroundImages.length > 1 && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                    {backgroundImages.map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setCurrent(i)}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                                i === current ? 'w-6 bg-white' : 'w-1.5 bg-white/40'
+                            }`}
+                            aria-label={`Slide ${i + 1}`}
+                        />
+                    ))}
+                </div>
+            )}
+
             <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         </section>
     )

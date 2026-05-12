@@ -6,7 +6,7 @@ export const heroQuery = groq`
     eventDate,
     location,
     format,
-    "backgroundImage": backgroundImage.asset->url + "?w=1920&auto=format&fit=max&q=80",
+    "backgroundImages": backgroundImages[].asset->url,
     primaryCta,
     secondaryCta,
     registrationFee
