@@ -133,6 +133,25 @@ export const Carousel = ({ items, initialScroll = 0 }: CarouselProps) => {
             ))}
           </div>
         </div>
+
+        <div className="pointer-events-none absolute bottom-20 right-8 md:bottom-36 md:right-16 z-50 flex gap-3">
+          <button
+            className="pointer-events-auto flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-full bg-[#8b7ff5] hover:bg-[#7a6ee0] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-xl shadow-black/40"
+            onClick={scrollLeft}
+            disabled={!canScrollLeft}
+            aria-label="Scroll left"
+          >
+            <IconArrowNarrowLeft className="h-7 w-7 md:h-8 md:w-8 text-white" />
+          </button>
+          <button
+            className="pointer-events-auto flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-full bg-[#8b7ff5] hover:bg-[#7a6ee0] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-xl shadow-black/40"
+            onClick={scrollRight}
+            disabled={!canScrollRight}
+            aria-label="Scroll right"
+          >
+            <IconArrowNarrowRight className="h-7 w-7 md:h-8 md:w-8 text-white" />
+          </button>
+        </div>
       </div>
     </CarouselContext.Provider>
   );
