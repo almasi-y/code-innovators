@@ -28,12 +28,10 @@ declare global {
 }
 
 const CATEGORIES = [
-    'Mobile Application Development',
-    'Animation and Digital Storytelling',
-    'Gamification',
-    'Robotics',
-    'Line Following Robots',
-    'Web Application Development',
+    'Website and Mobile App Development',
+    'Line Following',
+    'Animation and Gamification',
+    'Automation',
 ] as const
 
 const THEMATIC_AREAS = [
