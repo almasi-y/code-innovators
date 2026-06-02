@@ -30,6 +30,13 @@ export default defineType({
                 },
             }],
         }),
+        defineField({
+            name: 'observerNames',
+            title: 'Observers (Not Charged)',
+            type: 'array',
+            of: [{ type: 'string' }],
+            description: 'School-wide observers — attend but do not compete and are not charged',
+        }),
         defineField({ name: 'totalLearners',  title: 'Total Learners',    type: 'number' }),
         defineField({ name: 'totalAmountKes', title: 'Total Amount (KES)', type: 'number' }),
         defineField({ name: 'registrationId', title: 'Registration ID',    type: 'string' }),
