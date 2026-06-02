@@ -43,8 +43,9 @@ const THEMATIC_AREAS = [
     'Environment',
 ] as const
 
-const MAX_TEAMS    = 3
-const MAX_LEARNERS = 5
+const MAX_TEAMS     = 3
+const MAX_LEARNERS  = 5
+const MAX_OBSERVERS = 5
 const PAYSTACK_PUBLIC_KEY = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!
 
 const inputClass   = 'h-12 bg-white/5 border-white/10 text-white placeholder:text-white/25 focus-visible:border-[#8b7ff5] focus-visible:ring-[#8b7ff5]/20 rounded-xl text-sm'
@@ -93,6 +94,7 @@ export default function RegisterPage() {
 
     const [form, setForm]   = useState({ schoolName: '', contactPerson: '', email: '', phone: '' })
     const [teams, setTeams] = useState<Team[]>([newTeam()])
+    const [observers, setObservers] = useState<string[]>([])
     const [coupon, setCoupon]           = useState('')
     const [loading, setLoading]         = useState(false)
     const [statusMessage, setStatusMsg] = useState('')
@@ -105,6 +107,7 @@ export default function RegisterPage() {
     const [s2TeamIdx, setS2TeamIdx]   = useState(0)
     const [s2FieldIdx, setS2FieldIdx] = useState(0)
     const [s2AskAdd, setS2AskAdd]     = useState(false)
+    const [s2Observers, setS2Observers] = useState(false)
 
     useEffect(() => { getRegistrationFee().then(setFeePerLearner) }, [])
 
@@ -130,7 +133,7 @@ export default function RegisterPage() {
     // Reset sub-navigation when step changes
     useEffect(() => {
         setFieldIndex(0)
-        if (step === 2) { setS2TeamIdx(0); setS2FieldIdx(0); setS2AskAdd(false) }
+        if (step === 2) { setS2TeamIdx(0); setS2FieldIdx(0); setS2AskAdd(false); setS2Observers(false) }
     }, [step])
 
     function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -158,6 +161,11 @@ export default function RegisterPage() {
     function addTeam() { if (teams.length < MAX_TEAMS) setTeams(p => [...p, newTeam()]) }
     function removeTeam(ti: number) { if (teams.length > 1) setTeams(p => p.filter((_, i) => i !== ti)) }
 
+    // Observers — school-wide, not charged, capped at MAX_OBSERVERS
+    function addObserver()                 { setObservers(p => p.length >= MAX_OBSERVERS ? p : [...p, '']) }
+    function setObserver(i: number, v: string) { setObservers(p => p.map((o, j) => j === i ? v : o)) }
+    function removeObserver(i: number)     { setObservers(p => p.filter((_, j) => j !== i)) }
+
     function getPayload() {
         return {
             schoolName: form.schoolName,
@@ -170,6 +178,7 @@ export default function RegisterPage() {
                 thematicArea: t.thematicArea,
                 learnerNames: t.learners.filter(l => l.trim()),
             })),
+            observerNames: observers.filter(o => o.trim()),
         }
     }
 
@@ -236,6 +245,8 @@ export default function RegisterPage() {
             }
             if (!isLastMobileField) { setDirection(1); setFieldIndex(f => f + 1) }
             else goNextStep()
+        } else if (step === 2 && s2Observers) {
+            goNextStep()
         } else if (step === 2 && !s2AskAdd) {
             const err = validateS2Field()
             if (err) { setError(err); return }
@@ -247,7 +258,7 @@ export default function RegisterPage() {
                 } else if (teams.length < MAX_TEAMS) {
                     setDirection(1); setS2AskAdd(true)
                 } else {
-                    goNextStep()
+                    setDirection(1); setS2Observers(true)
                 }
             }
         }
@@ -259,7 +270,11 @@ export default function RegisterPage() {
             if (fieldIndex > 0) { setDirection(-1); setFieldIndex(f => f - 1) }
             else goPrevStep()
         } else if (step === 2) {
-            if (s2AskAdd) {
+            if (s2Observers) {
+                setDirection(-1); setS2Observers(false)
+                if (teams.length < MAX_TEAMS) { setS2AskAdd(true) }
+                else { setS2TeamIdx(teams.length - 1); setS2FieldIdx(3) }
+            } else if (s2AskAdd) {
                 setDirection(-1); setS2AskAdd(false)
             } else if (s2FieldIdx > 0) {
                 setDirection(-1); setS2FieldIdx(f => f - 1)
@@ -368,7 +383,7 @@ export default function RegisterPage() {
 
     // Animation key changes on every mobile sub-step so AnimatePresence fires correctly
     const mobileKey = step === 2
-        ? `2-${s2TeamIdx}-${s2FieldIdx}-${s2AskAdd}`
+        ? `2-${s2TeamIdx}-${s2FieldIdx}-${s2AskAdd}-${s2Observers}`
         : `${step}-${fieldIndex}`
 
     // Convenience shorthand for the current team on step 2
@@ -394,7 +409,7 @@ export default function RegisterPage() {
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            {(step > 1 || fieldIndex > 0 || (step === 2 && (s2FieldIdx > 0 || s2TeamIdx > 0 || s2AskAdd))) && (
+                            {(step > 1 || fieldIndex > 0 || (step === 2 && (s2FieldIdx > 0 || s2TeamIdx > 0 || s2AskAdd || s2Observers))) && (
                                 <button onClick={mobileBack} className="text-white/50 hover:text-white p-1 -ml-1 transition-colors">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                                         <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -565,6 +580,41 @@ export default function RegisterPage() {
                                 </>
                             )}
 
+                            {/* ── Step 2: Observers (school-wide, not charged) ── */}
+                            {step === 2 && s2Observers && (
+                                <>
+                                    <p className="text-white font-display text-3xl font-semibold leading-tight mb-2">Observers</p>
+                                    <p className="text-white/40 text-base mb-6">
+                                        Students who&apos;ll attend but aren&apos;t competing — <span className="text-white/70">not charged</span>. Up to {MAX_OBSERVERS} per school. Optional.
+                                    </p>
+                                    <div className="flex flex-col gap-3">
+                                        {observers.map((obs, oi) => (
+                                            <div key={oi} className="flex items-center gap-3">
+                                                <span className="text-white/30 text-sm font-mono w-5 text-center shrink-0">{oi + 1}</span>
+                                                <input
+                                                    ref={oi === 0 ? inputRef : undefined}
+                                                    value={obs}
+                                                    onChange={e => setObserver(oi, e.target.value)}
+                                                    placeholder={`Observer ${oi + 1} full name`}
+                                                    className="flex-1 h-14 bg-white/5 border border-white/10 text-white text-base placeholder:text-white/25 rounded-2xl px-4 focus:outline-none focus:border-[#8b7ff5] transition-colors"
+                                                />
+                                                <button type="button" onClick={() => removeObserver(oi)}
+                                                    className="w-10 h-10 shrink-0 rounded-full bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 flex items-center justify-center transition-colors">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/40"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {observers.length < MAX_OBSERVERS && (
+                                        <button type="button" onClick={addObserver}
+                                            className="mt-4 flex items-center gap-2 text-[#8b7ff5] hover:text-[#a094f7] text-sm font-medium transition-colors">
+                                            <span className="text-xl leading-none">+</span> Add Observer
+                                        </button>
+                                    )}
+                                    <p className="mt-3 text-white/25 text-xs">{observers.filter(o => o.trim()).length} / {MAX_OBSERVERS} observers added</p>
+                                </>
+                            )}
+
                             {/* ── Step 3: Review & Pay ── */}
                             {step === 3 && (
                                 <>
@@ -588,6 +638,12 @@ export default function RegisterPage() {
                                                 {i < teams.length - 1 && <div className="border-t border-white/10 mt-3" />}
                                             </div>
                                         ))}
+                                        {observers.filter(o => o.trim()).length > 0 && (
+                                            <>
+                                                <div className="border-t border-white/10" />
+                                                <Row label="Observers (free)" value={observers.filter(o => o.trim()).join(', ')} />
+                                            </>
+                                        )}
                                         <div className="border-t border-white/10" />
                                         <Row label="Total Learners" value={String(totalLearners)} />
                                         <Row label="Total Amount"   value={`KES ${totalAmount.toLocaleString()}`} />
@@ -628,9 +684,9 @@ export default function RegisterPage() {
                             }} className="w-full py-4 rounded-2xl border border-[#8b7ff5] text-[#8b7ff5] font-bold text-base transition-all">
                                 + Register Team {teams.length + 1}
                             </button>
-                            <button onClick={goNextStep}
+                            <button onClick={() => { setDirection(1); setS2AskAdd(false); setS2Observers(true) }}
                                 className="w-full py-4 rounded-2xl bg-[#8b7ff5] hover:bg-[#7a6ee0] text-white font-bold text-base transition-all shadow-lg shadow-[#8b7ff5]/30">
-                                Continue to Review →
+                                Continue →
                             </button>
                         </div>
                     ) : (
@@ -707,6 +763,33 @@ export default function RegisterPage() {
                                                 <span className="text-lg leading-none">+</span> Add another team
                                             </button>
                                         )}
+
+                                        {/* Observers — school-wide, not charged */}
+                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col gap-3">
+                                            <div>
+                                                <p className="text-white/60 text-xs uppercase tracking-widest font-medium mb-1">Observers</p>
+                                                <p className="text-white/40 text-xs">Students who attend but don&apos;t compete — <span className="text-white/70">not charged</span>. Up to {MAX_OBSERVERS} per school.</p>
+                                            </div>
+                                            {observers.map((obs, oi) => (
+                                                <div key={oi} className="flex items-center gap-2">
+                                                    <span className="text-white/30 text-xs font-mono w-4 text-center shrink-0">{oi + 1}</span>
+                                                    <input value={obs} onChange={e => setObserver(oi, e.target.value)}
+                                                        placeholder={`Observer ${oi + 1} full name`}
+                                                        className="flex-1 h-10 bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/25 rounded-xl px-3 focus:outline-none focus:border-[#8b7ff5] transition-colors" />
+                                                    <button type="button" onClick={() => removeObserver(oi)}
+                                                        className="w-8 h-8 shrink-0 rounded-full bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 flex items-center justify-center transition-colors">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-white/40"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            {observers.length < MAX_OBSERVERS && (
+                                                <button type="button" onClick={addObserver}
+                                                    className="self-start flex items-center gap-1 text-[#8b7ff5] hover:text-[#a094f7] text-xs font-medium transition-colors mt-1">
+                                                    <span className="text-sm leading-none">+</span> Add Observers
+                                                </button>
+                                            )}
+                                        </div>
+
                                         <p className="text-white/25 text-xs">
                                             {teams.length} / {MAX_TEAMS} teams · {totalLearners} learner{totalLearners !== 1 ? 's' : ''} · Total: KES {totalAmount.toLocaleString()}
                                         </p>
@@ -735,6 +818,12 @@ export default function RegisterPage() {
                                                     {i < teams.length - 1 && <div className="border-t border-white/10 mt-3" />}
                                                 </div>
                                             ))}
+                                            {observers.filter(o => o.trim()).length > 0 && (
+                                                <>
+                                                    <div className="border-t border-white/10" />
+                                                    <Row label="Observers (free)" value={observers.filter(o => o.trim()).join(', ')} />
+                                                </>
+                                            )}
                                             <div className="border-t border-white/10" />
                                             <Row label="Total Learners" value={String(totalLearners)} />
                                             <Row label="Total Amount"   value={`KES ${totalAmount.toLocaleString()}`} />

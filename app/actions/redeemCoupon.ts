@@ -6,8 +6,9 @@ import { apiVersion, dataset, projectId } from '@/sanity/env'
 import { signTicketId } from '@/lib/ticket-token'
 import type { RegistrationPayload } from './completeRegistration'
 
-const MAX_TEAMS    = 3
-const MAX_LEARNERS = 5
+const MAX_TEAMS     = 3
+const MAX_LEARNERS  = 5
+const MAX_OBSERVERS = 5
 
 function validatePayload(data: RegistrationPayload): string | null {
     if (!data.schoolName?.trim())    return 'School name is required.'
@@ -21,6 +22,9 @@ function validatePayload(data: RegistrationPayload): string | null {
         if (!team.thematicArea?.trim()) return 'Each team must have a thematic area.'
         if (!Array.isArray(team.learnerNames) || team.learnerNames.length < 1) return 'Each team must have at least one learner.'
         if (team.learnerNames.length > MAX_LEARNERS) return `Maximum ${MAX_LEARNERS} learners per team.`
+    }
+    if (data.observerNames && data.observerNames.length > MAX_OBSERVERS) {
+        return `Maximum ${MAX_OBSERVERS} observers per school.`
     }
     return null
 }
@@ -86,6 +90,7 @@ export async function redeemCouponAndRegister(
         email: data.email,
         phone: data.phone || undefined,
         teams: data.teams.map(t => ({ ...t, _key: crypto.randomBytes(4).toString('hex') })),
+        observerNames: data.observerNames?.filter(o => o.trim()) ?? [],
         totalLearners,
         totalAmountKes: 0,
         registrationId,
