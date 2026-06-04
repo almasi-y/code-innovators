@@ -4,12 +4,14 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { QRCodeSVG } from 'qrcode.react'
 import type { TicketData } from './page'
+import { learnerLimit } from '@/lib/registrationLimits'
+import AddLearner from './AddLearner'
 
 const EVENT_DATE     = '13 June 2026'
 const EVENT_TIME     = '09:00 AM'
 const EVENT_LOCATION = 'Khadija Comprehensive'
 
-export default function TicketCard({ ticket, baseUrl, token }: { ticket: TicketData; baseUrl: string; token: string }) {
+export default function TicketCard({ ticket, baseUrl, token, feeKes }: { ticket: TicketData; baseUrl: string; token: string; feeKes: number }) {
     const [downloading, setDownloading] = useState(false)
     const ticketUrl = `${baseUrl}/check-in/${ticket.ticketId}?token=${encodeURIComponent(token)}`
     const cardId = `printable-ticket-${ticket.ticketId}`
@@ -161,6 +163,21 @@ export default function TicketCard({ ticket, baseUrl, token }: { ticket: TicketD
                     Register Another
                 </a>
             </div>
+
+            {/* Add a learner to this team (charged per learner) */}
+            {ticket.category && (
+                <div className="w-full max-w-sm">
+                    <AddLearner
+                        ticketId={ticket.ticketId}
+                        token={token}
+                        email={ticket.email}
+                        teamName={ticket.teamName}
+                        currentCount={(ticket.learnerNames ?? []).filter((n) => n.trim()).length}
+                        maxLearners={learnerLimit(ticket.category).max}
+                        feeKes={feeKes}
+                    />
+                </div>
+            )}
         </div>
     )
 }

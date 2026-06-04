@@ -1,11 +1,13 @@
 import { notFound } from 'next/navigation'
+import Script from 'next/script'
 import { client } from '@/sanity/lib/client'
 import { verifyTicketToken, signTicketId } from '@/lib/ticket-token'
+import { getRegistrationFee } from '@/lib/registrationFee'
 import Navbar from '@/app/components/sections/Navbar'
 import Footer from '@/app/components/sections/Footer'
 import TicketCard from './TicketCard'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://code-innovators-rho.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.codeinnovators.africa'
 const TICKET_ID_PATTERN = /^CI-[A-Z0-9]{8}$/
 
 export interface TicketData {
@@ -135,6 +137,7 @@ export default async function TicketPage({
         ...siblings.map(t => ({ ticket: t, token: signTicketId(t.ticketId) })),
     ]
 
+    const feeKes = await getRegistrationFee()
     const plural = allTickets.length > 1
 
     return (
@@ -157,11 +160,12 @@ export default async function TicketPage({
 
                 <div className={`${plural ? 'flex flex-wrap gap-8' : ''}`}>
                     {allTickets.map(({ ticket: t, token: tok }) => (
-                        <TicketCard key={t.ticketId} ticket={t} baseUrl={BASE_URL} token={tok} />
+                        <TicketCard key={t.ticketId} ticket={t} baseUrl={BASE_URL} token={tok} feeKes={feeKes} />
                     ))}
                 </div>
             </main>
             <Footer />
+            <Script src="https://js.paystack.co/v1/inline.js" strategy="afterInteractive" />
         </div>
     )
 }

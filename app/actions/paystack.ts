@@ -7,7 +7,7 @@ import { signTicketId } from '@/lib/ticket-token'
 import { getRegistrationFee } from '@/lib/registrationFee'
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY!
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://code-innovators-rho.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.codeinnovators.africa'
 
 const writeClient = createClient({
     projectId,

@@ -19,6 +19,7 @@ export default defineType({
         defineField({ name: 'learnerNames',      title: 'Learner Names',       type: 'array', of: [{ type: 'string' }] }),
         defineField({ name: 'amount',            title: 'Amount (KES)',        type: 'number' }),
         defineField({ name: 'paystackReference', title: 'Paystack Reference',  type: 'string' }),
+        defineField({ name: 'topUpReferences',   title: 'Top-up Payments',     type: 'array', of: [{ type: 'string' }], description: 'Paystack references for learners added after the original registration' }),
         defineField({
             name: 'status',
             title: 'Status',
