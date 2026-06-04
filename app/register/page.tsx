@@ -388,7 +388,6 @@ export default function RegisterPage() {
 
     function handlePay() {
         setError(null)
-        if (loading) return
 
         if (hasCoupon) {
             // couponInfo is kept current by the debounced effect, so read it synchronously.
@@ -435,7 +434,7 @@ export default function RegisterPage() {
     )
 
     const LoadingOverlay = () => (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center pointer-events-none">
             <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl px-10 py-8 flex flex-col items-center gap-4 text-center">
                 <svg className="animate-spin w-10 h-10 text-[#8b7ff5]" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="60" strokeDashoffset="20" strokeLinecap="round" />
@@ -739,9 +738,9 @@ export default function RegisterPage() {
                 {/* Bottom button(s) */}
                 <div className="shrink-0 px-5 pb-5 pt-3 border-t border-white/5">
                     {step === 3 ? (
-                        <button onClick={handlePay} disabled={loading}
-                            className="w-full py-4 rounded-2xl bg-[#8b7ff5] hover:bg-[#7a6ee0] disabled:opacity-50 text-white font-bold text-base transition-all shadow-lg shadow-[#8b7ff5]/25">
-                            {payButtonLabel}
+                        <button onClick={handlePay} type="button"
+                            className="w-full py-4 rounded-2xl bg-[#8b7ff5] hover:bg-[#7a6ee0] text-white font-bold text-base transition-all shadow-lg shadow-[#8b7ff5]/25 cursor-pointer">
+                            {loading ? (statusMessage || 'Processing…') : payButtonLabel}
                         </button>
                     ) : step === 2 && s2AskAdd ? (
                         <div className="flex flex-col gap-3">
@@ -914,9 +913,9 @@ export default function RegisterPage() {
                                                 <p className="text-white/25 text-xs">Have a coupon? Free coupons skip payment; discount coupons charge the reduced rate.</p>
                                             )}
                                         </div>
-                                        <button onClick={handlePay} disabled={loading}
-                                            className="w-full py-4 rounded-2xl bg-[#8b7ff5] hover:bg-[#7a6ee0] disabled:opacity-50 text-white font-bold text-base transition-all shadow-lg shadow-[#8b7ff5]/25">
-                                            {payButtonLabel}
+                                        <button onClick={handlePay} type="button"
+                                            className="w-full py-4 rounded-2xl bg-[#8b7ff5] hover:bg-[#7a6ee0] text-white font-bold text-base transition-all shadow-lg shadow-[#8b7ff5]/25 cursor-pointer">
+                                            {loading ? (statusMessage || 'Processing…') : payButtonLabel}
                                         </button>
                                     </>}
                                 </motion.div>
