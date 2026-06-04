@@ -310,6 +310,8 @@ export default function RegisterPage() {
     async function validateCoupon(): Promise<{ type: 'free' | 'discount'; feePerLearnerKes: number } | null> {
         const code = coupon.trim()
         if (!code) { setCouponInfo(null); setCouponError(''); return null }
+        // Already validated for the current code (handleCouponChange clears this on edit) — skip the re-check.
+        if (couponInfo) return couponInfo
         setCouponChecking(true); setCouponError('')
         try {
             const info = await lookupCoupon(code)
@@ -381,19 +383,20 @@ export default function RegisterPage() {
         setError(null)
 
         if (hasCoupon) {
-            if (couponChecking) { setError('Checking your coupon… try again in a second.'); return }
-            if (couponError)    { setError(couponError); return }
-            // Coupon typed but not validated yet → validate, then ask for one more click
-            // (the popup must open synchronously from a click, so we can't await here).
-            if (!couponInfo) {
-                validateCoupon().then(info => {
-                    if (info?.type === 'free') setError('Coupon applied — click again to register.')
-                    else if (info?.type === 'discount') setError('Coupon applied — click again to pay the discounted rate.')
-                })
+            // Already validated → act immediately and synchronously (popup must open from the click).
+            if (couponInfo) {
+                if (couponInfo.type === 'free') { redeemFreeCoupon(); return }
+                openPaystack(couponInfo.feePerLearnerKes)   // discount
                 return
             }
-            if (couponInfo.type === 'free') { redeemFreeCoupon(); return }
-            openPaystack(couponInfo.feePerLearnerKes)   // discount
+            if (couponError)    { setError(couponError); return }
+            if (couponChecking) { setError('Checking your coupon… try again in a second.'); return }
+            // Coupon typed but not validated yet → validate, then ask for one more click
+            // (the popup must open synchronously from a click, so we can't await here).
+            validateCoupon().then(info => {
+                if (info?.type === 'free') setError('Coupon applied — click again to register.')
+                else if (info?.type === 'discount') setError('Coupon applied — click again to pay the discounted rate.')
+            })
             return
         }
 
