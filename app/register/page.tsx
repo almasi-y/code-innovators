@@ -12,7 +12,8 @@ import {
     SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { completeRegistrationWithPayment } from '@/app/actions/completeRegistration'
-import { redeemCouponAndRegister } from '@/app/actions/redeemCoupon'
+import { redeemCouponAndRegister, redeemDiscountCouponWithPayment } from '@/app/actions/redeemCoupon'
+import { lookupCoupon } from '@/app/actions/lookupCoupon'
 import { getRegistrationFee } from '@/app/actions/getRegistrationFee'
 import { CATEGORIES, THEMATIC_AREAS, MAX_OBSERVERS, learnerLimit } from '@/lib/registrationLimits'
 
@@ -295,12 +296,58 @@ export default function RegisterPage() {
 
     async function handleCouponSubmit() {
         setLoading(true); setStatusMsg('Validating coupon…')
-        const result = await redeemCouponAndRegister(coupon, getPayload())
-        if (result.success && result.ticketId && result.token) {
-            handleSuccess(result.ticketId, result.token)
-        } else {
-            setLoading(false); setStatusMsg(''); setError(result.error ?? 'Coupon redemption failed.')
+
+        const info = await lookupCoupon(coupon)
+        if (!info.ok) {
+            setLoading(false); setStatusMsg(''); setError(info.error)
+            return
         }
+
+        // Free coupon → register immediately, no payment
+        if (info.type === 'free') {
+            const result = await redeemCouponAndRegister(coupon, getPayload())
+            if (result.success && result.ticketId && result.token) {
+                handleSuccess(result.ticketId, result.token)
+            } else {
+                setLoading(false); setStatusMsg(''); setError(result.error ?? 'Coupon redemption failed.')
+            }
+            return
+        }
+
+        // Discount coupon → pay the discounted rate via Paystack
+        if (!window.PaystackPop) {
+            setLoading(false); setStatusMsg(''); setError('Payment widget still loading. Try again.')
+            return
+        }
+        if (totalLearners < 1) {
+            setLoading(false); setStatusMsg(''); setError('No learners added.')
+            return
+        }
+
+        const discountedTotal = info.feePerLearnerKes * totalLearners
+        setLoading(false); setStatusMsg('')
+
+        const bytes = new Uint8Array(12); crypto.getRandomValues(bytes)
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        const rand  = Array.from(bytes).map(b => chars[b % chars.length]).join('')
+
+        window.PaystackPop.setup({
+            key: PAYSTACK_PUBLIC_KEY, email: form.email,
+            amount: discountedTotal * 100, currency: 'KES',
+            ref: `CPN-${rand}`,
+            metadata: { schoolName: form.schoolName, contactPerson: form.contactPerson, teamCount: teams.length, totalLearners, coupon: coupon.trim().toUpperCase() },
+            callback(response) {
+                setLoading(true); setStatusMsg('Payment confirmed! Saving your registration…')
+                redeemDiscountCouponWithPayment(coupon, response.reference, getPayload()).then(result => {
+                    if (result.success && result.ticketId && result.token) {
+                        handleSuccess(result.ticketId, result.token)
+                    } else {
+                        setLoading(false); setStatusMsg(''); setError(result.error ?? 'Something went wrong.')
+                    }
+                })
+            },
+            onClose() { setLoading(false); setStatusMsg('') },
+        }).openIframe()
     }
 
     function handlePay() {
@@ -825,7 +872,7 @@ export default function RegisterPage() {
                                             <label className={labelClass}>Coupon Code <span className="text-white/25 normal-case">(optional)</span></label>
                                             <Input value={coupon} onChange={e => setCoupon(e.target.value.toUpperCase())}
                                                 placeholder="Enter code" className={inputClass + ' font-mono tracking-wider'} />
-                                            <p className="text-white/25 text-xs">Have a coupon? No payment required.</p>
+                                            <p className="text-white/25 text-xs">Have a coupon? Apply it at checkout — free coupons skip payment, discount coupons charge the reduced rate.</p>
                                         </div>
                                         <button onClick={handlePay} disabled={loading}
                                             className="w-full py-4 rounded-2xl bg-[#8b7ff5] hover:bg-[#7a6ee0] disabled:opacity-50 text-white font-bold text-base transition-all shadow-lg shadow-[#8b7ff5]/25">

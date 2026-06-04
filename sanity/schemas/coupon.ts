@@ -17,6 +17,35 @@ export default defineType({
                     .error('Must be 4–16 uppercase letters or numbers'),
         }),
         defineField({
+            name: 'discountType',
+            title: 'Coupon Type',
+            type: 'string',
+            options: {
+                list: [
+                    { title: 'Free (100% off — no payment)', value: 'free' },
+                    { title: 'Fixed price per learner', value: 'fixedPerLearner' },
+                ],
+                layout: 'radio',
+            },
+            initialValue: 'free',
+            description: 'Free coupons require no payment. Fixed-price coupons charge the set amount per learner via Paystack.',
+        }),
+        defineField({
+            name: 'feePerLearnerKes',
+            title: 'Price per learner (KES)',
+            type: 'number',
+            description: 'Only for "Fixed price per learner" coupons — e.g. 700',
+            hidden: ({ parent }) => parent?.discountType !== 'fixedPerLearner',
+            validation: (R) =>
+                R.custom((val, ctx) => {
+                    const parent = ctx.parent as { discountType?: string } | undefined
+                    if (parent?.discountType === 'fixedPerLearner' && (!val || (val as number) <= 0)) {
+                        return 'Set a price per learner greater than 0'
+                    }
+                    return true
+                }),
+        }),
+        defineField({
             name: 'isUsed',
             title: 'Used?',
             type: 'boolean',
