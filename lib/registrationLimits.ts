@@ -25,15 +25,15 @@ export const SERVER_MAX_TEAMS = 100
 
 type LearnerLimit = { min: number; max: number }
 
-// Min / max learners per team, by category.
+// Exactly 2 learners per team for every category (min 2, max 2).
 const LEARNER_LIMITS: Record<string, LearnerLimit> = {
-    'Website and Mobile App Development': { min: 2, max: 3 },
-    'Line Following':                     { min: 2, max: 5 },
-    'Animation and Gamification':         { min: 2, max: 3 },
-    'Automation':                         { min: 2, max: 5 },
+    'Website and Mobile App Development': { min: 2, max: 2 },
+    'Line Following':                     { min: 2, max: 2 },
+    'Animation and Gamification':         { min: 2, max: 2 },
+    'Automation':                         { min: 2, max: 2 },
 }
 
-const DEFAULT_LEARNER_LIMIT: LearnerLimit = { min: 2, max: 5 }
+const DEFAULT_LEARNER_LIMIT: LearnerLimit = { min: 2, max: 2 }
 
 export function learnerLimit(category: string): LearnerLimit {
     return LEARNER_LIMITS[category] ?? DEFAULT_LEARNER_LIMIT
