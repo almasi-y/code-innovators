@@ -29,6 +29,9 @@ declare global {
     }
 }
 
+// Set to true to reopen the registration form. When false, /register shows the closed notice.
+const REGISTRATION_OPEN = false
+
 const MAX_TEAMS = Infinity   // schools can register as many teams as they want
 const PAYSTACK_PUBLIC_KEY = (process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '').trim().replace(/^["']|["']$/g, '')
 
@@ -451,6 +454,40 @@ export default function RegisterPage() {
 
     // Convenience shorthand for the current team on step 2
     const ct = teams[s2TeamIdx] ?? newTeam()
+
+    if (!REGISTRATION_OPEN) {
+        return (
+            <div className="bg-background min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-1 flex items-center justify-center px-5 py-24">
+                    <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="max-w-lg text-center flex flex-col items-center gap-6"
+                    >
+                                      
+                        <h1 className="font-display text-[clamp(2.25rem,6vw,3.75rem)] font-semibold leading-[1.05] tracking-tight text-white">
+                            Registration is now closed
+                        </h1>
+
+                        <p className="text-white/55 text-base sm:text-lg leading-relaxed max-w-md">
+                            Thank you to every school, team, and learner who signed up — the response has been incredible.
+                            We can&apos;t wait to see what you build. All the best at the Code Innovators Festival!
+                        </p>
+
+                        <a
+                            href="/"
+                            className="mt-2 bg-[#8b7ff5] hover:bg-[#7a6ee0] text-white font-semibold px-8 py-3 rounded-full text-sm transition-colors shadow-lg shadow-[#8b7ff5]/20"
+                        >
+                            Back to home
+                        </a>
+                    </motion.div>
+                </main>
+                <Footer />
+            </div>
+        )
+    }
 
     return (
         <>
