@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useTimer } from "react-timer-hook";
 
-// Festival date: June 13, 2026 at 08:00 EAT (UTC+3) = 05:00 UTC
+// Festival date: June 13, 2027 at 08:00 EAT (UTC+3) = 05:00 UTC
 // Using Date.UTC to avoid iOS Safari rejecting the +03:00 offset in ISO strings
-const FESTIVAL_DATE = new Date(Date.UTC(2026, 5, 13, 5, 0, 0));
+const FESTIVAL_DATE = new Date(Date.UTC(2027, 5, 13, 5, 0, 0));
 
 interface TimeUnitProps {
   value: number;
