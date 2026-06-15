@@ -7,7 +7,7 @@ import type { TicketData } from './page'
 import { learnerLimit } from '@/lib/registrationLimits'
 import AddLearner from './AddLearner'
 
-const EVENT_DATE     = '13 June 2026'
+const EVENT_DATE     = '13 June 2027'
 const EVENT_TIME     = '09:00 AM'
 const EVENT_LOCATION = 'Khadija Comprehensive'
 

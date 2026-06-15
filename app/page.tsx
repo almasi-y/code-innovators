@@ -13,7 +13,7 @@ import SpeakersSection from './components/sections/SpeakersSection'
 // Fallback data when Sanity document hasn't been created yet
 const fallbackHero = {
   title: 'Code Innovation Festival',
-  eventDate: 'June 13, 2026',
+  eventDate: 'June 13, 2027',
   location: 'Khadija Comprehensive',
   format: 'Inter-School Competition',
   backgroundImage: null,
